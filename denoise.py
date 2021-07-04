@@ -1,16 +1,44 @@
-import matplotlib.pyplot as plt
+get_ipython().system('pip install noisereduce')
+
+import librosa
+import noisereduce as nr
 import numpy as np
-plt.rcParams['figure.figsize'] = [16, 12]
-plt.rcParams.update({'font.size': 18})
+from IPython.display import Audio
+import math
 
-# criando o sinal
-dt = 0.001
-t = np.arange(0,1,dt)
-f = np.sin(2*np.pi*50*t) + np.sin(2*np.pi*120*t)
-f_clean = f
-f = f + 2.5*np.random.randn(len(t))
 
-plt.plot(t,f,color='c', LineWidth=1.5, label='Noisy')
-plt.plot(t,f_clean, color='k', LineWidth=2, label='Clean')
-plt.xlim(t[0],t[-1])
-plt.legend()
+path = '/Users/airpenha/Projects/python/pmo/131139Z.mp3'
+data, fs = librosa.load(path)
+
+
+
+time = np.arange(0, len(data))/fs
+n = len(time)
+total_time_seconds = len(data)/fs
+
+
+time_end = math.floor(time[n-1])
+noisy_part = data[0:3627534]
+# perform noise reduction
+reduced_noise = nr.reduce_noise(audio_clip=data, noise_clip=noisy_part, verbose=True)
+
+Audio(data=reduced_noise,rate=fs)
+Audio(data=data,rate=fs)
+
+
+snr = 20 # signal to noise ratio = 20
+noise_clip = data/snr
+audio_clip_filtred = reduced_noise + noise_clip
+
+
+Audio(data=audio_clip_cafe,rate=fs)
+
+
+
+noise_reduced = nr.reduce_noise(audio_clip=reduced_noise.astype('float32'),
+                                noise_clip=noise_clip.astype('float32'),
+                                use_tensorflow=True, 
+                                verbose=False)
+
+Audio(data=noise_reduced,rate=fs)
+
